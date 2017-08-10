@@ -1,9 +1,4 @@
-/*
-This is more advanced stuff, and I want you to first get 100% familiar with what I showed you before. Code a couple of projects, maybe some bigger ones, whithout using object oriented JS, so that you will find the limitaions that it has when the code grows bigger and bigger.
-*/
 
-
-/////////////////////////////////////////////////////////////////////
 // Function constructor for an expense. We choose to create objects like this because we will have multiple expenses, so we will create many objects. We put methods in its prototype so all objects created through this constructor will inherit these methods, instead of having the methods attached to each individual object. We will read and mutate all its properties using methods, to further encapsulate the data
 function Expense(id, description, value) {
     this.id = id; // For deleting items
@@ -32,9 +27,6 @@ Expense.prototype = {
 
 
 
-
-
-/////////////////////////////////////////////////////////////////////
 // Function constructor for an income. We don't need methods here because we can borrow them from the Expenses, since they are similar in terms of properties
 function Income(id, description, value) {
     this.id = id;
@@ -43,10 +35,6 @@ function Income(id, description, value) {
 }
 
 
-
-
-
-/////////////////////////////////////////////////////////////////////
 // Function that return an object containing properties and methods for controlling all expenses
 function expenseController() { //Later add Constructor argument to this
     
@@ -69,16 +57,9 @@ function expenseController() { //Later add Constructor argument to this
             newItem = new Constructor(newID, des, val);
             this.allItems.push(newItem);
             return newItem;
-        },
-        // Later when we need to borrow the functions, add Constructor as an argument and replace Expense with it
-        
-        //Do some currying (partial application) with the addItem function: one for each Type
-        
+        }, 
 
         deleteItem: function(id) {
-            // We cannot simple do this.allItems[id] because ID are not in order because when an item gets deleted, we can have like 0 1 3 4 7
-
-            // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/map
             var ids = this.allItems.map(function(current, index) {
                 return current.id;
             })
@@ -86,7 +67,7 @@ function expenseController() { //Later add Constructor argument to this
             var index = ids.indexOf(id);
 
             if(index >= 0) {
-                this.allItems.splice(index, 1); // Don't confuse with slice
+                this.allItems.splice(index, 1);
             }
         },
 
@@ -118,10 +99,6 @@ function expenseController() { //Later add Constructor argument to this
     };
 }
 
-
-
-
-/////////////////////////////////////////////////////////////////////
 // Function that returns an object containing properties for controlling all incomes. Methods will be borrowed from the expenseController
 function incomeController() {
     
@@ -131,11 +108,6 @@ function incomeController() {
     };
 } 
 
-
-
-
-
-/////////////////////////////////////////////////////////////////////
 // Function that returns an object containing properties and methods for manipulating the UI
 function UIController() {
     
@@ -162,12 +134,9 @@ function UIController() {
         },
         
         clearFields: function() {
-            // Just for showing sake: selecting many at once, convert to array using call and Array prototype (because it returns a list) and then iterate over that array with .forEach
-            var fields = document.querySelectorAll(
-                this.DOMSelectors.inputDescription + ', ' + this.DOMSelectors.inputValue);
+            this.DOMSelectors.inputDescription + ', ' + this.DOMSelectors.inputValue);
             var fieldsArr = Array.prototype.slice.call(fields);
-            
-            // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/forEach
+          
             fieldsArr.forEach(function(current) {
                 current.value = "";
             })
@@ -198,7 +167,6 @@ function UIController() {
         },
 
         deleteListItem: function(selectorID) {
-            // The only way we have is remove child, so we first need to move up to the parent and then delete the child
             var el = document.getElementById(selectorID)
             el.parentNode.removeChild(el);
         },
@@ -214,8 +182,6 @@ function UIController() {
         },
         
         displayExpensePercentages: function(percentages) {
-            // Better solution to loop over querySelectorAll results:
-            //https://toddmotto.com/ditch-the-array-foreach-call-nodelist-hack/
             
             var fields = document.querySelectorAll(this.DOMSelectors.expensesPercentages);
             
@@ -270,11 +236,6 @@ function UIController() {
     };
 }
 
-
-
-
-
-/////////////////////////////////////////////////////////////////////
 // Function that returns an object containing properties and methods for controlling the app. We do it with the function, instead of just having a plain object, because this way we can pass in the other controllers (or modules), making each of these controllers more isolated. So they don't knpw about the other names, they are all indepemndent from each other. This also shows us how a closure works: we call 'controller' with the other controllers as arguments, and then return an object containing a couple of functions that use these controllers, even AFTER the original controller function has stopped running. We still have access to the values that were passed into the function, and that is the closure. We closed in on these variables.
 function controller(incCtrl, expCtrl, UICtrl, Inc, Exp) {
     return {
@@ -345,11 +306,9 @@ function controller(incCtrl, expCtrl, UICtrl, Inc, Exp) {
         },
         
         handleInputPressEnter: function() {
-            // We need this because the this keyword in a function inside a function points to the global object, not the this keyword that was defined before. So we store it in a separate variable, and self is a convention, or this
-            var self = this; 
+        
             document.addEventListener('keypress', function(event) {
                 if (event.which === 13 || event.keyCode === 13) {
-                    // We fake a click here because what we want to happen here is the exact same thing as what happens when we hit the input button
                     document.querySelector(self.DOMSelectors.inputBtn).click();
                 }
             });
@@ -359,10 +318,8 @@ function controller(incCtrl, expCtrl, UICtrl, Inc, Exp) {
             var newItem, self = this;
             document.querySelector(this.DOMSelectors.container).addEventListener('click', function(event) {
                 var clickID, splitID, type, id
-                //Leave the parent node out first. Not the cleanest solution, as we're relying very much on the DOM structure, basically hard coding it here. We could use a while loop instead
                 clickID = event.target.parentNode.parentNode.parentNode.parentNode.id;
-                
-                // We can do this because there are no other IDs
+              
                 if (clickID) {
                     splitID = clickID.split('-');
                     type = splitID[0];
@@ -388,7 +345,7 @@ function controller(incCtrl, expCtrl, UICtrl, Inc, Exp) {
         },
         
         updateTotals: function() {
-            // We calculate the sums of all incomes and expenses, calculate the difference and call the function to update the UI with all the data
+           
             expCtrl.calculateTotal();
             expCtrl.calculateTotal.call(incCtrl);
             budget = this.calculateBudget();
@@ -414,14 +371,12 @@ function controller(incCtrl, expCtrl, UICtrl, Inc, Exp) {
         },
         
         updateExpensePercentages: function() {
-            // We calculate the percentages of each income, passing the total income, then retreieve these percentages, and finally display them on th UI
+           
             expCtrl.calculatePercentages(expCtrl.getTotal.call(incCtrl));
             var perc = expCtrl.getPercentages();
             UICtrl.displayExpensePercentages(perc);
         },
-        
-        // Sometimes we don't know anything, so we google it, devs do this all the time "javascript validate numbers"
-        // http://stackoverflow.com/questions/18082/validate-decimal-numbers-in-javascript-isnumeric
+     
         isNumeric: function(n) {
             return !isNaN(parseFloat(n)) && isFinite(n);
         }
@@ -430,12 +385,6 @@ function controller(incCtrl, expCtrl, UICtrl, Inc, Exp) {
 
 
 
-
-
-
-
-/////////////////////////////////////////////////////////////////////
-
 var exp = expenseController(Expense);
 var inc = incomeController(Income);
 var UI = UIController();
@@ -443,22 +392,3 @@ var ctrl = controller(inc, exp, UI, Income, Expense);
 
 ctrl.init()
 
-
-
-
-/*
-var e1 = new Expense(0, 'Dining', 45);
-var in1 = new Income(0, 'Salary', 1900);
-
-e1.getValue() // 45
-e1.getValue.call(in1) // 1900
-Expense.prototype.getValue.call(in1) // 1900
-*/
-
-/*
-My goal with this is not to make you copy the code and then make your own similar applications. What I want, is you to learn how to program, and how to think as a programmer, how to use these tools to solve the particular problems that you might have to solve in your case. So while this code and this small simple architecure is good for this project, it might not be in your case. But that's okay, because, once again, this project is just to show you how to use the tools JavaScript gives us.
-
-So once again, this is a very simple app. If you have a more complex app you wanna build, you're probably going to use some grameowrk or library like Angular or React. And that's fine, but you still will have to understand JavaScript, and that's what this course and this project is for.
-
-
-*/
