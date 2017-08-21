@@ -16,18 +16,12 @@ Expense.prototype = {
         }
         
         return this.percentage;
-        
-        /* Let's return a function here to demonstrate closures and first-class functions. Usually we would just return Math.round(this.value / total) * 100
-        return function(value) {
-            return Math.round(value / total) * 100
-        }
-        */
     }
 }
 
 
 
-// Function constructor for an income. We don't need methods here because we can borrow them from the Expenses, since they are similar in terms of properties
+// Function constructor for an income. 
 function Income(id, description, value) {
     this.id = id;
     this.description = description;
@@ -43,11 +37,9 @@ function expenseController() { //Later add Constructor argument to this
         total: 0,
 
         // Not using the same names here on purpose, do it's less confusing
-        // We return the newItem so that we can use it in the controller (more specifically, to pass it to the UIController which displays it in the UI)
         addItem: function(Constructor, des, val) {
             var newID, newItem;
-            
-            // This is necessary because deletions will change the order, so we always want the next id to be the last +1
+    
             if (this.allItems.length > 0) {
                 newID = this.allItems[this.allItems.length - 1].id + 1;
             } else {
@@ -236,7 +228,6 @@ function UIController() {
     };
 }
 
-// Function that returns an object containing properties and methods for controlling the app. We do it with the function, instead of just having a plain object, because this way we can pass in the other controllers (or modules), making each of these controllers more isolated. So they don't knpw about the other names, they are all indepemndent from each other. This also shows us how a closure works: we call 'controller' with the other controllers as arguments, and then return an object containing a couple of functions that use these controllers, even AFTER the original controller function has stopped running. We still have access to the values that were passed into the function, and that is the closure. We closed in on these variables.
 function controller(incCtrl, expCtrl, UICtrl, Inc, Exp) {
     return {
         DOMSelectors: {
